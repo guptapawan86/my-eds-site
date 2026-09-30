@@ -314,19 +314,13 @@ main > .section {
 }
 
 main > .section > div {
-  max-width: 1200px;
+  max-width: var(--content-max-width);
   margin: auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
 }
 
 main > .section:first-of-type {
   margin-top: 0;
-}
-
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
 }
 
 /* section metadata */
@@ -335,4 +329,146 @@ main .section.highlight {
   background-color: var(--light-color);
   margin: 0;
   padding: 40px 0;
+}
+
+/* full-bleed media */
+main > .section.full-width {
+  margin: 0;
+}
+
+main > .section.full-width > div {
+  max-width: none;
+  padding: 0;
+}
+
+main .section.full-width picture,
+main .section.full-width img {
+  display: block;
+  width: 100%;
+}
+
+main .section.full-width img {
+  height: 240px;
+  object-fit: cover;
+}
+
+@media (width >= 900px) {
+  main .section.full-width img {
+    height: 420px;
+  }
+}
+
+/* article body with related-tags sidebar */
+main > .section.article-body {
+  margin: 0;
+  padding: 48px 0 80px;
+}
+
+main > .section.article-body > .cards-related-tags-wrapper {
+  margin-top: var(--block-gap);
+}
+
+main .section.article-body .default-content-wrapper > picture {
+  display: block;
+  margin-top: var(--block-gap);
+}
+
+main .section.article-body .default-content-wrapper > picture img {
+  display: block;
+  width: 100%;
+  border-radius: var(--radius-image);
+}
+
+main .section.article-body .default-content-wrapper > picture + p {
+  margin: 12px 0 var(--block-gap);
+  color: var(--caption-color);
+  font-size: var(--body-font-size-s);
+  line-height: 18px;
+}
+
+@media (width >= 1112px) {
+  main > .section.article-body {
+    display: grid;
+    grid-template-columns: minmax(0, 878fr) minmax(0, 314fr);
+    column-gap: 64px;
+    align-items: start;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: 48px var(--gutter) 80px;
+  }
+
+  main > .section.article-body > div {
+    grid-column: 1;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* span every row so the sidebar sits beside all article content */
+  main > .section.article-body > .cards-related-tags-wrapper {
+    grid-column: 2;
+    grid-row: 1 / span 10;
+    margin-top: 0;
+  }
+}
+
+/* article header: read time, title, standfirst, byline */
+main > .section.article-header {
+  margin: 48px 0;
+}
+
+main .section.article-header .default-content-wrapper > * {
+  max-width: 878px;
+}
+
+main .section.article-header .default-content-wrapper > p:has(> picture) {
+  display: inline-block;
+  margin: 8px 12px 0 0;
+  vertical-align: middle;
+}
+
+main .section.article-header .default-content-wrapper > p:has(> picture) img {
+  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+main .section.article-header .default-content-wrapper > p:has(> picture) + p {
+  display: inline-block;
+  margin: 8px 0 0;
+  vertical-align: middle;
+  font-size: var(--body-font-size-s);
+  font-weight: 700;
+  line-height: 18px;
+}
+
+main .section.article-header .default-content-wrapper > p:first-child {
+  margin-bottom: 16px;
+  font-size: var(--body-font-size-s);
+  line-height: 18px;
+}
+
+/* dark band */
+main > .section.dark {
+  margin: 0;
+  padding: 64px 0 72px;
+  background-color: var(--dark-color);
+  color: var(--background-color);
+}
+
+main .section.dark h2 {
+  margin: 0 0 40px;
+  font-size: var(--heading-font-size-xxl);
+  font-weight: 300;
+  line-height: var(--heading-line-height-xxl);
+}
+
+main .section.dark a:any-link {
+  color: var(--background-color);
+}
+
+main .section.dark a:hover {
+  color: var(--link-on-dark-hover-color);
 }

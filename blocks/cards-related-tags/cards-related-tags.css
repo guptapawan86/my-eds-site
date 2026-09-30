@@ -1,11 +1,14 @@
-/* Cards (related tags) - structural layout only; brand styling is applied by the design pass. */
+/* Cards (related tags) - taxonomy tag groups, styled after datacom.com .article-body__right-column */
 
 /*
- * Layout follows the block's own width, not the viewport: the block may sit at full
- * width at the end of the article body, or in a narrow sidebar column.
+ * Two layouts, matching the source:
+ * - inline (default: mobile, tablet, or anywhere the block is wide): groups and tags flow in rows
+ * - sidebar (desktop, when the block sits in the narrow article-body column): groups and
+ *   tags stack vertically
  */
 .cards-related-tags {
   container-type: inline-size;
+  color: var(--text-color);
 }
 
 .cards-related-tags .cards-related-tags-groups {
@@ -13,19 +16,24 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: 1.5em;
+  flex-flow: row wrap;
 }
 
 .cards-related-tags .cards-related-tags-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
   min-width: 0;
+  max-width: 100%;
+  padding-bottom: 8px;
 }
 
 .cards-related-tags .cards-related-tags-title {
   margin: 0;
+  padding: 0 24px 12px 0;
+  color: var(--text-color);
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 24px;
+  letter-spacing: -0.2px;
 }
 
 .cards-related-tags .cards-related-tags-list {
@@ -34,34 +42,74 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em;
 }
 
 .cards-related-tags .cards-related-tags-list > li {
-  margin: 0;
+  margin: 0 8px 8px 0;
   max-width: 100%;
 }
 
-/* pill-shaped tag links (shape only; colors come from the design pass) */
-.cards-related-tags a.cards-related-tags-tag {
-  display: inline-block;
+/* pill-shaped tag links; overrides the global link and button styles */
+.cards-related-tags a.cards-related-tags-tag:any-link {
+  display: block;
+  width: fit-content;
   max-width: 100%;
-  padding: 0.25em 0.75em;
-  border-radius: 1em;
-  border: 1px solid currentcolor;
-  line-height: 1.4;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background-color: var(--tag-color);
+  color: var(--text-color);
+  font-family: var(--body-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  letter-spacing: -0.2px;
   text-decoration: none;
   overflow-wrap: anywhere;
 }
 
-/* wide placement (full-width article body): groups sit side by side */
-@container (width >= 600px) {
-  .cards-related-tags .cards-related-tags-groups {
-    flex-flow: row wrap;
-    column-gap: 3em;
-  }
+.cards-related-tags a.cards-related-tags-tag:any-link:hover,
+.cards-related-tags a.cards-related-tags-tag:any-link:focus-visible {
+  background-color: var(--tag-hover-color);
+  color: var(--text-color);
+  text-decoration: none;
+}
 
-  .cards-related-tags .cards-related-tags-group {
-    flex: 1 1 16em;
+@media (width >= 501px) {
+  .cards-related-tags .cards-related-tags-title {
+    font-weight: 700;
+  }
+}
+
+/* sidebar: the article-body section places the block in a 314px column from 1112px */
+@media (width >= 1112px) {
+  @container (width < 600px) {
+    .cards-related-tags .cards-related-tags-groups {
+      flex-flow: column nowrap;
+    }
+
+    .cards-related-tags .cards-related-tags-group {
+      padding-bottom: 0;
+    }
+
+    .cards-related-tags .cards-related-tags-title {
+      padding: 0 0 12px;
+      font-size: 24px;
+      font-weight: 600;
+      line-height: 32px;
+      letter-spacing: -0.5px;
+    }
+
+    .cards-related-tags .cards-related-tags-list {
+      flex-flow: column nowrap;
+      align-items: flex-start;
+      padding-bottom: 24px;
+    }
+
+    .cards-related-tags .cards-related-tags-list > li {
+      margin: 0 0 8px;
+    }
   }
 }
