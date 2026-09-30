@@ -38,7 +38,7 @@ const PAGE_TEMPLATE = {
       "selector": [
         ".article-cover"
       ],
-      "style": null,
+      "style": "article-header",
       "blocks": [],
       "defaultContent": [
         ".article-cover__top-row",
