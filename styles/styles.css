@@ -386,10 +386,10 @@ main .section.article-body .default-content-wrapper > picture + p {
   line-height: 18px;
 }
 
-@media (width >= 1112px) {
+@media (width >= 900px) {
   main > .section.article-body {
     display: grid;
-    grid-template-columns: minmax(0, 878fr) minmax(0, 314fr);
+    grid-template-columns: minmax(0, 1fr) 314px;
     column-gap: 64px;
     align-items: start;
     max-width: var(--content-max-width);
