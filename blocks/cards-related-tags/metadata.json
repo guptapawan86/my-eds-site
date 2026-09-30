@@ -1,0 +1,22 @@
+{
+  "variantName": "cards-related-tags",
+  "baseBlock": "cards",
+  "canonicalModel": "standalone",
+  "visualCharacteristics": {
+    "colorScheme": "light",
+    "density": "compact",
+    "purpose": "article-sidebar-taxonomy-tags",
+    "imagePattern": "noimg",
+    "structure": "group heading + pill tag links"
+  },
+  "contentPattern": "1 column; each row = one group: <h3>/<p><strong> group title + paragraph(s) of links (one link per tag)",
+  "usage": {
+    "pagesUsing": [
+      "https://datacom.com/au/en/insights/articles/why-technology-supply-chains-remain-under-pressure"
+    ],
+    "reuseCount": 1,
+    "lastUsed": "2026-09-30"
+  },
+  "options": [],
+  "memberVariantIds": []
+}

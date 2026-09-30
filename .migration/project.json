@@ -1,0 +1,11 @@
+{
+  "type": "doc",
+  "sites": {
+    "my-eds-site": {
+      "previewOrg": "guptapawan86",
+      "previewSite": "my-eds-site",
+      "botProtected": true,
+      "libraryUrl": "https://main--sta-boilerplate--aemdemos.aem.page/tools/sidekick/library.json"
+    }
+  }
+}

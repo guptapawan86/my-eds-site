@@ -1,0 +1,90 @@
+{
+  "templates": [
+    {
+      "name": "articles",
+      "urls": [
+        "https://datacom.com/au/en/insights/articles/why-technology-supply-chains-remain-under-pressure"
+      ],
+      "representativeUrl": "https://datacom.com/au/en/insights/articles/why-technology-supply-chains-remain-under-pressure",
+      "description": "Datacom insights article: cover header, full-width cover image, long-form body with related-tags sidebar, and dark Discover more related-article cards",
+      "blocks": [
+        {
+          "name": "cards-related-tags",
+          "instances": [
+            ".article-body__right-column"
+          ]
+        },
+        {
+          "name": "cards-articles",
+          "instances": [
+            ".gallery.dark-theme .gallery-list"
+          ]
+        }
+      ],
+      "urlPattern": "/au/en/insights/articles/*",
+      "sections": [
+        {
+          "id": "section-1",
+          "name": "Article header",
+          "selector": [
+            ".article-cover"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            ".article-cover__top-row",
+            "h1.article-cover__heading",
+            ".article-cover__left-column p",
+            ".article-cover__bottom-row"
+          ]
+        },
+        {
+          "id": "section-2",
+          "name": "Cover image",
+          "selector": [
+            ".article-cover-image.wide-cover-image",
+            ".article-cover-image"
+          ],
+          "style": "full-width",
+          "blocks": [],
+          "defaultContent": [
+            ".article-cover-image img"
+          ]
+        },
+        {
+          "id": "section-3",
+          "name": "Article body with sidebar",
+          "selector": [
+            ".article-body"
+          ],
+          "style": "article-body",
+          "blocks": [
+            "cards-related-tags"
+          ],
+          "defaultContent": [
+            ".article-body__left-column .article-body-text",
+            ".article-body__left-column .heading.title",
+            ".article-body__left-column .article-body-image"
+          ]
+        },
+        {
+          "id": "section-4",
+          "name": "Discover more",
+          "selector": [
+            ".gallery.dark-theme"
+          ],
+          "style": "dark",
+          "blocks": [
+            "cards-articles"
+          ],
+          "defaultContent": [
+            ".gallery__heading"
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "projectType": "doc"
+  }
+}
