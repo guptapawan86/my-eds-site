@@ -94,7 +94,7 @@ function buildLocale(section) {
   const submitP = paras[paras.length - 1];
   const options = [...section.querySelectorAll('ul a')].map((a) => ({
     label: a.textContent.trim(),
-    prefix: a.getAttribute('href').replace(/\/$/, ''),
+    prefix: new URL(a.getAttribute('href'), window.location.href).pathname.replace(/\/$/, ''),
     flag: a.querySelector('img'),
   }));
   const path = window.location.pathname;

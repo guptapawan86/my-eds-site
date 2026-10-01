@@ -22,8 +22,17 @@ export function normalizeFragmentMedia(container, base) {
     }).join(', ');
   });
 
+  // a link whose text is its own URL (absolute in Word, possibly rewritten to relative)
+  const isUrlLink = (a) => {
+    const text = a.textContent.trim();
+    if (!/^(https?:\/\/|\/)/.test(text)) return false;
+    const fromText = new URL(text, base);
+    const fromHref = new URL(a.getAttribute('href'), base);
+    return fromText.pathname === fromHref.pathname && fromText.search === fromHref.search;
+  };
+
   container.querySelectorAll('a').forEach((a) => {
-    if (a.textContent.trim() !== a.getAttribute('href')) return;
+    if (!isUrlLink(a)) return;
     let prev = a.previousSibling;
     const gaps = [];
     while (isGap(prev)) {
