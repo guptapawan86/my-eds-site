@@ -146,6 +146,21 @@ function renderCardGrid(cards, backLabel) {
   return grid;
 }
 
+/** Mobile sub-panel header: back, centred title, close. Hidden on desktop. */
+function renderPanelHead(title) {
+  const head = el('div', 'nav-panel-head');
+  const back = el('button', 'nav-back', ICONS.arrowLeft);
+  back.type = 'button';
+  back.setAttribute('aria-label', 'Back');
+  const heading = el('p', 'nav-panel-title');
+  heading.textContent = title;
+  const close = el('button', 'nav-close', ICONS.close);
+  close.type = 'button';
+  close.setAttribute('aria-label', 'Close menu');
+  head.append(back, heading, close);
+  return head;
+}
+
 function renderTieredPanel(categories) {
   const panel = el('div', 'nav-panel-inner nav-panel-tiered');
   const tabs = el('div', 'nav-cats');
@@ -162,10 +177,14 @@ function renderTieredPanel(categories) {
     tab.setAttribute('role', 'tab');
     tab.textContent = cat.label;
     tab.insertAdjacentHTML('beforeend', `<span class="nav-icon">${ICONS.chevronRight}</span>`);
-    tab.addEventListener('click', () => activate(index));
+    tab.addEventListener('click', () => {
+      activate(index);
+      panel.classList.add('cat-open');
+    });
     tabs.append(tab);
     const view = el('div', 'nav-cat-view');
     view.setAttribute('role', 'tabpanel');
+    view.append(renderPanelHead(cat.label));
     if (cat.hero) view.append(renderHero(cat.hero));
     view.append(renderCardGrid(cat.cards));
     views.push(view);
@@ -193,6 +212,7 @@ function buildNavItem(li) {
   if (directLink) {
     const a = directLink.cloneNode(true);
     a.className = 'nav-link';
+    a.insertAdjacentHTML('beforeend', `<span class="nav-icon nav-link-chevron">${ICONS.chevronRight}</span>`);
     item.append(a);
     return item;
   }
@@ -200,10 +220,12 @@ function buildNavItem(li) {
   const trigger = el('button', 'nav-link nav-trigger');
   trigger.type = 'button';
   trigger.textContent = label;
+  trigger.insertAdjacentHTML('beforeend', `<span class="nav-icon nav-link-chevron">${ICONS.chevronRight}</span>`);
   trigger.setAttribute('aria-expanded', 'false');
   item.append(trigger);
 
   const panel = el('div', 'nav-panel');
+  panel.append(renderPanelHead(label));
   const list = directChildren(li, 'UL')[0];
   const lis = directChildren(list, 'LI');
   // categories start with a text-only label; cards start with their image
@@ -267,7 +289,7 @@ function buildSearch(section, nav) {
   input.autocomplete = 'off';
   input.placeholder = actionLink ? actionLink.textContent.trim() : '';
   input.setAttribute('aria-label', input.placeholder);
-  form.append(back, input);
+  form.append(back, el('span', 'nav-search-icon', ICONS.search), input);
 
   const quick = el('div', 'nav-search-quick');
   const quickTitle = labels[1];
@@ -331,8 +353,34 @@ export default async function decorate(block) {
   const overlay = el('div', 'nav-overlay');
   const closeAllPanels = () => {
     navList.querySelectorAll('.nav-trigger[aria-expanded="true"]').forEach((t) => t.setAttribute('aria-expanded', 'false'));
+    navList.querySelectorAll('.cat-open').forEach((t) => t.classList.remove('cat-open'));
     wrapper.closest('header').classList.toggle('overlay-open', nav.classList.contains('search-open'));
   };
+
+  // mobile menu: hamburger morphs to a cross and opens the full-screen menu
+  const hamburger = el('button', 'nav-hamburger', '<span></span><span></span><span></span>');
+  hamburger.type = 'button';
+  hamburger.setAttribute('aria-controls', 'nav');
+  hamburger.setAttribute('aria-label', 'Open navigation');
+  hamburger.setAttribute('aria-expanded', 'false');
+  const toggleMenu = (open) => {
+    const header = wrapper.closest('header');
+    header.classList.toggle('menu-open', open);
+    hamburger.setAttribute('aria-expanded', open);
+    hamburger.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+    document.body.style.overflowY = open && !isDesktop.matches ? 'hidden' : '';
+    if (!open) closeAllPanels();
+  };
+  hamburger.addEventListener('click', () => toggleMenu(hamburger.getAttribute('aria-expanded') !== 'true'));
+  nav.addEventListener('click', (e) => {
+    const back = e.target.closest('.nav-back');
+    if (back) {
+      const tiered = back.closest('.nav-cat-view') && back.closest('.nav-panel-tiered');
+      if (tiered) tiered.classList.remove('cat-open');
+      else closeAllPanels();
+    }
+    if (e.target.closest('.nav-close')) toggleMenu(false);
+  });
 
   let searchApi = null;
   if (searchSection) {
@@ -359,9 +407,10 @@ export default async function decorate(block) {
     if (e.code !== 'Escape') return;
     closeAllPanels();
     if (searchApi) searchApi.close();
+    if (!isDesktop.matches) toggleMenu(false);
   });
 
-  bar.append(brand, navSections, tools);
+  bar.append(brand, navSections, tools, hamburger);
   if (searchApi) bar.append(searchApi.search);
   nav.append(bar);
   wrapper.append(nav, overlay);
@@ -369,7 +418,7 @@ export default async function decorate(block) {
 
   // reset open states when crossing the desktop breakpoint
   isDesktop.addEventListener('change', () => {
-    closeAllPanels();
+    toggleMenu(false);
     if (searchApi) searchApi.close();
   });
 }
