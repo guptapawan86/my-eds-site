@@ -5,6 +5,9 @@ const ICONS = {
   chevronDown: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
 };
 
+// below this width headed columns collapse into an accordion
+const isDesktop = window.matchMedia('(width >= 900px)');
+
 function el(tag, className, html) {
   const e = document.createElement(tag);
   if (className) e.className = className;
@@ -42,12 +45,21 @@ function isExternal(a) {
 function buildColumn(section) {
   const col = el('div', 'footer-column');
   const heading = directChildren(section, 'H2')[0];
-  if (heading) {
-    const label = el('p', 'footer-column-label');
-    label.textContent = heading.textContent.trim();
-    col.append(label);
-  }
   const list = directChildren(section, 'UL')[0];
+  let toggle = null;
+  if (heading) {
+    toggle = el('button', 'footer-column-label');
+    toggle.type = 'button';
+    toggle.textContent = heading.textContent.trim();
+    toggle.insertAdjacentHTML('beforeend', `<span class="footer-column-chevron">${ICONS.chevronDown}</span>`);
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.addEventListener('click', () => {
+      if (isDesktop.matches) return;
+      toggle.setAttribute('aria-expanded', toggle.getAttribute('aria-expanded') !== 'true');
+    });
+    col.classList.add('footer-column-collapsible');
+    col.append(toggle);
+  }
   if (list) {
     list.className = 'footer-links';
     list.querySelectorAll('a').forEach((a) => {
@@ -59,7 +71,16 @@ function buildColumn(section) {
         a.insertAdjacentHTML('beforeend', `<span class="footer-link-arrow">${ICONS.arrowUpRight}</span>`);
       }
     });
-    col.append(list);
+    if (toggle) {
+      // grid wrapper animates the accordion height on mobile
+      const panel = el('div', 'footer-column-panel');
+      const inner = el('div', 'footer-column-panel-inner');
+      inner.append(list);
+      panel.append(inner);
+      col.append(panel);
+    } else {
+      col.append(list);
+    }
   }
   return col;
 }

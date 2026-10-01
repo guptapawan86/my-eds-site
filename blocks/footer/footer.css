@@ -22,24 +22,72 @@ footer .footer svg {
 
 footer .footer-columns {
   display: grid;
-  gap: 28px;
   max-width: var(--content-max-width);
   margin: 0 auto;
-  padding: 48px var(--gutter);
+  padding: 32px var(--gutter);
   font-size: var(--body-font-size-s);
   line-height: 18px;
-}
-
-footer .footer-column-label {
-  margin: 0;
-  padding-bottom: 12px;
-  font-weight: 700;
 }
 
 footer .footer-links {
   margin: 0;
   padding: 0;
   list-style: none;
+}
+
+/* headed columns: accordion on mobile, static columns on desktop */
+footer .footer .footer-column-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 24px 0;
+  font-weight: 700;
+  line-height: 18px;
+  text-align: left;
+}
+
+footer .footer-column-chevron {
+  display: flex;
+  align-items: center;
+  height: 18px;
+  transition: transform 0.2s ease-in-out;
+}
+
+footer .footer-column-chevron svg {
+  width: 21px;
+  height: 21px;
+}
+
+footer .footer-column-label[aria-expanded="true"] .footer-column-chevron {
+  transform: rotate(180deg);
+}
+
+footer .footer-column-collapsible {
+  border-bottom: 1px solid #dadada;
+}
+
+footer .footer-column-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s ease;
+}
+
+footer .footer-column-label[aria-expanded="true"] + .footer-column-panel {
+  grid-template-rows: 1fr;
+}
+
+footer .footer-column-panel-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+footer .footer-column-panel .footer-links {
+  padding: 24px 16px 16px;
+}
+
+footer .footer-column-last {
+  padding: 32px 0 24px;
 }
 
 footer .footer a.footer-link:any-link {
@@ -83,7 +131,7 @@ footer .footer-locale-btn svg {
 }
 
 footer .footer-copyright {
-  margin-top: 28px;
+  margin-top: 20px;
   font-size: var(--body-font-size-xs);
   line-height: 18px;
   letter-spacing: -0.12px;
@@ -262,8 +310,34 @@ footer .footer .footer-locale-continue:hover {
     padding: 48px;
   }
 
+  footer .footer .footer-column-label {
+    padding: 0 0 12px;
+    cursor: default;
+  }
+
+  footer .footer-column-chevron {
+    display: none;
+  }
+
+  footer .footer-column-collapsible {
+    border-bottom: 0;
+  }
+
+  footer .footer-column-label + .footer-column-panel {
+    grid-template-rows: 1fr;
+    transition: none;
+  }
+
+  footer .footer-column-panel .footer-links {
+    padding: 0;
+  }
+
   footer .footer-column-last {
     border-left: 1px solid #dadada;
-    padding-left: 16px;
+    padding: 0 0 0 16px;
+  }
+
+  footer .footer-copyright {
+    margin-top: 28px;
   }
 }
