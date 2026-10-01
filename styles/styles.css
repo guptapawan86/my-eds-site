@@ -31,8 +31,8 @@
   --heading-line-height-xl: 32px;
   --heading-line-height-l: 24px;
 
-  /* nav height */
-  --nav-height: 64px;
+  /* nav height: alert banner (72px) + main bar (80px) */
+  --nav-height: 152px;
 }
 
 /* fallback font */
