@@ -36,7 +36,7 @@ export function normalizeFragmentMedia(container, base) {
   });
 
   container.querySelectorAll('a').forEach((a) => {
-    if (!a.isConnected) return;
+    if (!container.contains(a)) return;
     let next = a.nextSibling;
     const gaps = [];
     while (isGap(next)) {
