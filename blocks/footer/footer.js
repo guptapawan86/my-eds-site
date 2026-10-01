@@ -1,3 +1,5 @@
+import { normalizeFragmentMedia } from '../../scripts/fragment-media.js';
+
 const ICONS = {
   arrowUpRight: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2"/></svg>',
   globe: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>',
@@ -30,10 +32,7 @@ async function fetchFooter() {
   if (!resp.ok) return null;
   const container = document.createElement('div');
   container.innerHTML = await resp.text();
-  container.querySelectorAll('img').forEach((img) => {
-    img.src = new URL(img.getAttribute('src'), resp.url).href;
-    img.loading = 'lazy';
-  });
+  normalizeFragmentMedia(container, resp.url);
   return container;
 }
 

@@ -1,3 +1,5 @@
+import { normalizeFragmentMedia } from '../../scripts/fragment-media.js';
+
 // media query match that indicates desktop width
 const isDesktop = window.matchMedia('(width >= 1200px)');
 
@@ -29,10 +31,7 @@ async function fetchNav() {
   if (!resp.ok) return null;
   const container = document.createElement('div');
   container.innerHTML = await resp.text();
-  container.querySelectorAll('img').forEach((img) => {
-    img.src = new URL(img.getAttribute('src'), resp.url).href;
-    img.loading = 'lazy';
-  });
+  normalizeFragmentMedia(container, resp.url);
   return container;
 }
 
@@ -42,40 +41,65 @@ function directChildren(parent, tag) {
   return parent ? [...parent.children].filter((c) => c.tagName === tag) : [];
 }
 
+/**
+ * Splits a list item's own content (not its nested list) into lines. Lines end at
+ * paragraph edges and <br>s, so items authored as paragraphs (local fragment) and as
+ * one paragraph with line breaks (Word) read the same.
+ * @param {Element} li list item
+ * @returns {Element[]} one wrapper per line
+ */
+function itemLines(li) {
+  const lines = [[]];
+  const breakLine = () => { if (lines[lines.length - 1].length) lines.push([]); };
+  const push = (n) => lines[lines.length - 1].push(n);
+  [...li.childNodes].forEach((n) => {
+    if (n.nodeName === 'UL' || n.nodeName === 'OL') return;
+    if (n.nodeName === 'BR') breakLine();
+    else if (n.nodeName === 'P') {
+      breakLine();
+      [...n.childNodes].forEach((c) => (c.nodeName === 'BR' ? breakLine() : push(c)));
+      breakLine();
+    } else if (n.nodeType !== 3 || n.textContent.trim()) push(n);
+  });
+  return lines.filter((l) => l.length).map((nodes) => {
+    const line = document.createElement('span');
+    line.append(...nodes.map((n) => n.cloneNode(true)));
+    return line;
+  });
+}
+
 function readCard(li) {
-  const paras = directChildren(li, 'P');
-  const img = li.querySelector(':scope > p img');
-  const titleP = paras.find((p) => p.querySelector('strong'));
-  const titleLink = titleP && titleP.querySelector('a');
-  const desc = paras.find((p) => p !== titleP && !p.querySelector('img'));
+  const lines = itemLines(li);
+  const imgLine = lines.find((l) => l.querySelector('img'));
+  const titleLine = lines.find((l) => l !== imgLine && l.querySelector('strong'))
+    || lines.find((l) => l !== imgLine);
+  const descLine = lines.find((l) => l !== imgLine && l !== titleLine);
+  const link = (titleLine && titleLine.querySelector('a')) || (imgLine && imgLine.querySelector('a'));
   const childList = directChildren(li, 'UL')[0];
   return {
-    title: titleP ? titleP.textContent.trim() : '',
-    href: titleLink ? titleLink.getAttribute('href') : null,
-    img,
-    desc: desc ? desc.textContent.trim() : '',
+    title: titleLine ? titleLine.textContent.trim() : '',
+    href: link ? link.getAttribute('href') : null,
+    img: imgLine ? imgLine.querySelector('img') : null,
+    desc: descLine ? descLine.textContent.trim() : '',
     children: childList ? directChildren(childList, 'LI').map(readCard) : null,
   };
 }
 
+// a hero leads with its bold title; cards lead with their image
+function isHeroItem(li) {
+  const [first, ...rest] = itemLines(li);
+  return !!first && !first.querySelector('img') && !!first.querySelector('strong')
+    && rest.some((l) => l.querySelector('img'));
+}
+
 function readHero(scope) {
-  const h = directChildren(scope, 'H3')[0];
-  if (!h) return null;
-  const imgP = h.nextElementSibling && h.nextElementSibling.querySelector('img')
-    ? h.nextElementSibling : null;
-  const descP = (imgP || h).nextElementSibling;
-  const link = h.querySelector('a');
-  return {
-    title: h.textContent.trim(),
-    href: link ? link.getAttribute('href') : null,
-    img: imgP ? imgP.querySelector('img') : null,
-    desc: descP && descP.tagName === 'P' ? descP.textContent.trim() : '',
-  };
+  const first = directChildren(directChildren(scope, 'UL')[0], 'LI')[0];
+  return first && isHeroItem(first) ? readCard(first) : null;
 }
 
 function readCards(scope) {
   const list = directChildren(scope, 'UL')[0];
-  return list ? directChildren(list, 'LI').map(readCard) : [];
+  return directChildren(list, 'LI').filter((li) => !isHeroItem(li)).map(readCard);
 }
 
 /* ---------- renderers ---------- */
@@ -208,7 +232,8 @@ function renderCardsPanel(hero, cards, label) {
  */
 function buildNavItem(li) {
   const item = el('li', 'nav-item');
-  const directLink = li.querySelector(':scope > a');
+  const [firstLine] = itemLines(li);
+  const directLink = !directChildren(li, 'UL').length && firstLine && firstLine.querySelector('a');
   if (directLink) {
     const a = directLink.cloneNode(true);
     a.className = 'nav-link';
@@ -216,7 +241,7 @@ function buildNavItem(li) {
     item.append(a);
     return item;
   }
-  const label = directChildren(li, 'P')[0].textContent.trim();
+  const label = firstLine.textContent.trim();
   const trigger = el('button', 'nav-link nav-trigger');
   trigger.type = 'button';
   trigger.textContent = label;
@@ -230,12 +255,12 @@ function buildNavItem(li) {
   const lis = directChildren(list, 'LI');
   // categories start with a text-only label; cards start with their image
   const tiered = lis.length && lis.every((c) => {
-    const first = directChildren(c, 'P')[0];
+    const [first] = itemLines(c);
     return directChildren(c, 'UL').length && first && !first.querySelector('img');
   });
   if (tiered) {
     panel.append(renderTieredPanel(lis.map((c) => ({
-      label: directChildren(c, 'P')[0].textContent.trim(),
+      label: itemLines(c)[0].textContent.trim(),
       hero: readHero(c),
       cards: readCards(c),
     }))));
