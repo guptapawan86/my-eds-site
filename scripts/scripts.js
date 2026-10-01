@@ -85,6 +85,8 @@ function buildScene7Rendition(src, { width, format }) {
     return k !== 'wid' && k !== 'fmt';
   });
   filtered.push(`wid=${width}`);
+  // without fit=constrain Scene7 pads (letterboxes) when wid exceeds the master width
+  if (!filtered.some((p) => p.split('=')[0] === 'fit')) filtered.push('fit=constrain');
   filtered.push(`fmt=${format}`);
   return `${base}?${filtered.join('&')}`;
 }
