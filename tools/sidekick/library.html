@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="Description" content="AEM Sidekick Library" />
+    <title>Sidekick Library</title>
+    <style>helix-sidekick { display: none }</style>
+    <script type="module" src="https://www.aem.live/tools/sidekick/library/index.js"></script>
+</head>
+<body>
+<main></main>
+<script>
+    const library = document.createElement('sidekick-library');
+    library.config = { base: '/tools/sidekick/library.json' };
+    document.body.prepend(library);
+</script>
+</body>
+</html>
